@@ -4,14 +4,14 @@ from nltk.tokenize import word_tokenize
 from nltk import stem
 it_stem=nltk.stem.SnowballStemmer('english')
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from googletrans import Translator
-from google_trans_new import google_translator
+
+#from google_trans_new import google_translator
 import re
 import numpy as np
 import pandas as pd
 from pprint import pprint
 import numbers
-from langdetect import detect
+#from langdetect import detect
 # Gensim
 import gensim
 import gensim.corpora as corpora
@@ -21,17 +21,17 @@ from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
 import glob
 import sys
-
+import plotly.express as px
 from wordcloud import WordCloud, STOPWORDS
 
 from emot.emo_unicode import UNICODE_EMO, EMOTICONS
 # spacy for lemmatization
 import spacy
-import mallet
+#import mallet
 
 # Plotting tools
-import pyLDAvis
-import pyLDAvis.gensim  # don't skip this
+#import pyLDAvis
+#import pyLDAvis.gensim  # don't skip this
 import matplotlib.pyplot as plt
 #%matplotlib inline
 
@@ -40,7 +40,8 @@ import importlib
 import nltk
 from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
-stop_words.extend([ 'u', 'https', 'www', 'youtu',  'com'])
+stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia', 'kotakuinact','9z3vqo', 'en',
+                    'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r', 'KotakuInAction', 'kotakuinaction'])
 #'would', 'want', 'could', 'go', 'get',
 
 #tokenizing
@@ -126,7 +127,7 @@ for file in files:
     nomefile = file.split(".")[0]
     luogo = nomefile.split("_")[0].lower()
     print(luogo)
-    df = pd.read_csv(file, sep="\t")
+    df = pd.read_csv(file)
     #df['english'] = df['Message'].apply(translator.translate, lang_src='it', lang_tgt='en')
     #print(df['english'])
     #print(df.columns)
@@ -167,16 +168,19 @@ for file in files:
         lista_tokenizzata.append(lemmatizza(msg))
 
     #wordcloud
-
     text = " ".join(msg for msg in message)
-    wordcloud = WordCloud(stopwords=stop_words, background_color="white").generate(text)
+    WC_height = 1000
+    WC_width = 1500
+    WC_max_words = 100
+    wordcloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width,stopwords=stop_words, background_color="white").generate(text)
 
     # Display the generated image:
     # the matplotlib way:
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis("off")
+    #plt.imshow(wordcloud, interpolation='bilinear')
+    #plt.axis("off")
     #plt.show()
     wordcloud.to_file(luogo + "_wordcloud.png")
+
 
     bigram = gensim.models.Phrases(lista_tokenizzata, min_count=2, threshold=100)
     trigram = gensim.models.Phrases(bigram[lista_tokenizzata], threshold=100)
@@ -193,6 +197,8 @@ for file in files:
     texts = data_lemmatized
     #converto la lista in text per fare una tf idf raw
     tokenized_list = [' '.join(inner_list) for inner_list in lista_tokenizzata]
+
+    ###FREQUENZE RELATIVE###
 
     # tfid singole parole
     # creating  tfid for bigrams
@@ -217,6 +223,7 @@ for file in files:
     #DF_TFIDF = pd.DataFrame(data=X2_single.toarray(), columns=features_single)
     #DF_TFIDF.to_csv("prova conto.csv")
     words_single.to_csv( luogo + "_relative_word_freq.csv")
+
     #creating  tfid fpr trigrams
     vectorizer_tr = CountVectorizer(ngram_range=(3, 3))
     X1_trigr = vectorizer_tr.fit_transform(tokenized_list)
@@ -235,7 +242,6 @@ for file in files:
     words_trigr = (ranking_trigr.sort_values('rank', ascending=False))
     print("\n\nWords head : \n", words_trigr.head(7))
     words_trigr.to_csv(luogo + "_relative_trigrams.csv")
-
 
     #creating  tfid for bigrams
     vectorizer_bi = CountVectorizer(ngram_range=(2, 2))
@@ -257,26 +263,90 @@ for file in files:
     print("\n\nWords : \n", words.head(7))
     words.to_csv(luogo + "_relative_bigrams.csv")
 
+    ###FREQENZE ASSOLUTE###
     #freqdist bigrammi
     testo= [y for x in texts for y in x]
-    Bigrams=nltk.bigrams(testo)
-    Frequenze_big=FreqDist(Bigrams)
-    #print(Frequenze_big.most_common(20))
-    Trigrams= nltk.trigrams(testo)
-    Frequenze_trig=FreqDist(Trigrams)
-    #print(Frequenze_trig.most_common(20))
-    rslt_bi = pd.DataFrame(Frequenze_big.most_common(80), columns=['Bigrams', 'Frequency'])
-    rslt_bi.to_excel(luogo +'_bigram.xlsx')
-    rslt_tr = pd.DataFrame(Frequenze_trig.most_common(80),columns=['Trigrams', 'Frequency'])
-    rslt_tr.to_excel(luogo + '_trigram.xlsx')
 
+    # PLOT E COUNT DELLE WORD CLOUD PER BIGRAMMI
+    Bigrams = nltk.bigrams(testo)
+    Frequenze_big = FreqDist(Bigrams)
+    rslt_bi = pd.DataFrame(Frequenze_big.most_common(80), columns=['Bigrams', 'Frequency'])
+    rslt_bi.to_excel(luogo + '_bigram.xlsx')
+    '''fig = px.bar(rslt_bi, x='Bigrams', y='Frequency', title='Top 20 bigrammi', template='plotly_white',
+                 labels={'Bigrams': 'Bigrammi', 'Frequency': 'Occorrenze'})
+    fig.show()
+    fig.save_fig(luogo + '_distribution_bigram.png')'''
+
+    #word cloud
+    bigrams_list = list(nltk.bigrams(testo))
+    #print(bigrams_list)
+    dictionary2 = [' '.join(tup) for tup in bigrams_list]
+    #print(dictionary2)
+
+    # Using count vectoriser to view the frequency of bigrams
+    vectorizer = CountVectorizer(ngram_range=(2, 2))
+    bag_of_words = vectorizer.fit_transform(dictionary2)
+    #vectorizer.vocabulary_
+    sum_words = bag_of_words.sum(axis=0)
+    words_freq = [(word, sum_words[0, idx]) for word, idx in vectorizer.vocabulary_.items()]
+    words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
+    #print(words_freq[:100])
+    # Generating wordcloud and saving as jpg image
+    words_dict = dict(words_freq)
+    WC_height = 1000
+    WC_width = 1500
+    WC_max_words = 100
+    wordCloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
+    wordCloud.generate_from_frequencies(words_dict)
+    plt.title('Most frequently occurring bigrams connected by same colour and font size')
+    #plt.imshow(wordCloud, interpolation='bilinear')
+    #plt.axis("off")
+    #plt.show()
+    wordCloud.to_file(luogo + '_wordcloud_bigram.jpg')
+
+    # PLOT DELLE WORD CLOUD PER TRIGRAMMI
+    Trigrams = nltk.trigrams(testo)
+    Frequenze_trig = FreqDist(Trigrams)
+    # print(Frequenze_trig.most_common(20))
+    rslt_tr = pd.DataFrame(Frequenze_trig.most_common(80), columns=['Trigrams', 'Frequency'])
+    rslt_tr.to_excel(luogo + '_trigram.xlsx')
+    '''fig = px.bar(rslt_tr, x='Trigrams', y='Frequency', title='Top 2 trigrammi', template='plotly_white',
+                 labels={'Trigrams': 'Trigrammi', 'Frequency': 'Occorrenze'})
+    fig.show()
+    fig.savefig(luogo + '_distribution_trigram.jpg')'''
+
+    trigrams_list = list(nltk.trigrams(testo))
+    # print(bigrams_list)
+    dictionary3 = [' '.join(tup) for tup in trigrams_list]
+    #print(dictionary3)
+
+    # Using count vectoriser to view the frequency of bigrams
+    vectorizer_3 = CountVectorizer(ngram_range=(3, 3))
+    bag_of_words_3 = vectorizer_3.fit_transform(dictionary3)
+    # vectorizer.vocabulary_
+    sum_words_3 = bag_of_words_3.sum(axis=0)
+    words_freq_3 = [(word, sum_words_3[0, idx]) for word, idx in vectorizer_3.vocabulary_.items()]
+    words_freq_3 = sorted(words_freq_3, key=lambda x: x[1], reverse=True)
+    #print(words_freq_3[:100])
+    # Generating wordcloud and saving as jpg image
+    trigr_dict = dict(words_freq_3)
+    WC_height = 1000
+    WC_width = 1500
+    WC_max_words = 100
+    wordcloud_trigr = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
+    wordcloud_trigr.generate_from_frequencies(trigr_dict)
+    plt.title('Most frequently occurring trigrams connected by same colour and font size')
+    #plt.imshow(wordcloud_trigr, interpolation='bilinear')
+    #plt.axis("off")
+    #plt.show()
+    wordcloud_trigr.to_file(luogo + '_wordcloud_trigram.jpg')
+
+    #FREQ ASSOLUTA SINGOLE PAROLE
     top_N = 150
     word_dist = nltk.FreqDist(testo)
     rslt = pd.DataFrame(word_dist.most_common(top_N), columns=['Word', 'Frequency'])
-    rslt.to_excel(luogo + 'abs_words_frequency.xlsx')
+    rslt.to_excel(luogo + '_abs_words_frequency.xlsx')
     #print(rslt)
-except:
-    pass
 
 
 try:
