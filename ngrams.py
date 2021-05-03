@@ -21,7 +21,7 @@ from gensim.models import TfidfModel
 from gensim.corpora import Dictionary
 import glob
 import sys
-import plotly.express as px
+#import plotly.express as px
 from wordcloud import WordCloud, STOPWORDS
 
 from emot.emo_unicode import UNICODE_EMO, EMOTICONS
@@ -40,8 +40,9 @@ import importlib
 import nltk
 from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
-stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia', 'kotakuinact','9z3vqo', 'en',
-                    'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r', 'KotakuInAction', 'kotakuinaction'])
+stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia','9z3vqo', 'en',
+                    'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r',
+                    '[deleted]', 'deleted', '™','TM'])
 #'would', 'want', 'could', 'go', 'get',
 
 #tokenizing
@@ -92,7 +93,7 @@ def emoji(string):
 def clean(series):
     series= series.str.lower()
     series=series.dropna()
-    for i in "“#‼$%&!'-★”’•()*+,-./:;<=>?@[\\]☑🤣😂^🇮🇹🤦👏🔴⚠_`{|}\n\t\"":
+    for i in "“#‼$%&!'-★”’•()*+,-™./:;<=>?@[\\]☑🤣😂^🇮🇹🤦👏🔴⚠_`{|}\n\t\"":
         series = series.str.replace(i, " ")
     series = series.str.replace("  ", "#")
     series = series.str.replace("#", " ")
@@ -135,6 +136,7 @@ for file in files:
     message_raw = df["title"]
     message = clean(message_raw)
     #print(message)
+    #input()
 
     my_list = []
     for text in message:
@@ -164,13 +166,13 @@ for file in files:
     lista_tokenizzata=[]
     for msg in message:
         #msg=  translator.translate(msg)
-        msg=emoji(msg)
+        #msg=emoji(msg)
         lista_tokenizzata.append(lemmatizza(msg))
 
     #wordcloud
     text = " ".join(msg for msg in message)
     WC_height = 1000
-    WC_width = 1500
+    WC_width = 1300
     WC_max_words = 100
     wordcloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width,stopwords=stop_words, background_color="white").generate(text)
 
@@ -294,7 +296,7 @@ for file in files:
     # Generating wordcloud and saving as jpg image
     words_dict = dict(words_freq)
     WC_height = 1000
-    WC_width = 1500
+    WC_width = 1300
     WC_max_words = 100
     wordCloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
     wordCloud.generate_from_frequencies(words_dict)
@@ -331,7 +333,7 @@ for file in files:
     # Generating wordcloud and saving as jpg image
     trigr_dict = dict(words_freq_3)
     WC_height = 1000
-    WC_width = 1500
+    WC_width = 1300
     WC_max_words = 100
     wordcloud_trigr = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
     wordcloud_trigr.generate_from_frequencies(trigr_dict)
