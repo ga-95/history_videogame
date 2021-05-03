@@ -42,7 +42,7 @@ from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
 stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia','9z3vqo', 'en',
                     'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r',
-                    '[deleted]', 'deleted', '™','TM'])
+                    '[deleted]', 'deleted','delete', 'delet', '™','TM'])
 #'would', 'want', 'could', 'go', 'get',
 
 #tokenizing
@@ -165,14 +165,13 @@ for file in files:
 
     lista_tokenizzata=[]
     for msg in message:
-        #msg=  translator.translate(msg)
         #msg=emoji(msg)
         lista_tokenizzata.append(lemmatizza(msg))
 
     #wordcloud
     text = " ".join(msg for msg in message)
-    WC_height = 1000
-    WC_width = 1300
+    WC_height = 500
+    WC_width = 800
     WC_max_words = 100
     wordcloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width,stopwords=stop_words, background_color="white").generate(text)
 
@@ -224,7 +223,7 @@ for file in files:
     #prova somma per le singole parole
     #DF_TFIDF = pd.DataFrame(data=X2_single.toarray(), columns=features_single)
     #DF_TFIDF.to_csv("prova conto.csv")
-    words_single.to_csv( luogo + "_relative_word_freq.csv")
+    words_single.to_excel( luogo + "_relative_word_freq.xlsx")
 
     #creating  tfid fpr trigrams
     vectorizer_tr = CountVectorizer(ngram_range=(3, 3))
@@ -243,7 +242,7 @@ for file in files:
     ranking_trigr = pd.DataFrame(data1_trigr, columns=['term', 'rank'])
     words_trigr = (ranking_trigr.sort_values('rank', ascending=False))
     print("\n\nWords head : \n", words_trigr.head(7))
-    words_trigr.to_csv(luogo + "_relative_trigrams.csv")
+    words_trigr.to_excel(luogo + "_relative_trigrams.xlsx")
 
     #creating  tfid for bigrams
     vectorizer_bi = CountVectorizer(ngram_range=(2, 2))
@@ -263,7 +262,7 @@ for file in files:
     ranking = pd.DataFrame(data1, columns=['term', 'rank'])
     words = (ranking.sort_values('rank', ascending=False))
     print("\n\nWords : \n", words.head(7))
-    words.to_csv(luogo + "_relative_bigrams.csv")
+    words.to_excel(luogo + "_relative_bigrams.xlsx")
 
     ###FREQENZE ASSOLUTE###
     #freqdist bigrammi
@@ -295,8 +294,8 @@ for file in files:
     #print(words_freq[:100])
     # Generating wordcloud and saving as jpg image
     words_dict = dict(words_freq)
-    WC_height = 1000
-    WC_width = 1300
+    WC_height = 500
+    WC_width = 800
     WC_max_words = 100
     wordCloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
     wordCloud.generate_from_frequencies(words_dict)
@@ -332,8 +331,8 @@ for file in files:
     #print(words_freq_3[:100])
     # Generating wordcloud and saving as jpg image
     trigr_dict = dict(words_freq_3)
-    WC_height = 1000
-    WC_width = 1300
+    WC_height = 500
+    WC_width = 800
     WC_max_words = 100
     wordcloud_trigr = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
     wordcloud_trigr.generate_from_frequencies(trigr_dict)
