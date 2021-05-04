@@ -202,7 +202,6 @@ for file in files:
     ###FREQUENZE RELATIVE###
 
     # tfid singole parole
-    # creating  tfid for bigrams
     vectorizer = CountVectorizer(ngram_range=(1, 1))
     X1_single = vectorizer.fit_transform(tokenized_list)
     features_single = (vectorizer.get_feature_names())
@@ -224,6 +223,12 @@ for file in files:
     #DF_TFIDF = pd.DataFrame(data=X2_single.toarray(), columns=features_single)
     #DF_TFIDF.to_csv("prova conto.csv")
     words_single.to_excel( luogo + "_relative_word_freq.xlsx")
+    #words_single.T.sum(axis=1)
+    tuples = [tuple(x) for x in words_single.values]
+    WC_height = 500
+    WC_width = 800
+    Cloud = WordCloud(background_color="white", max_words=100, height=WC_height, width=WC_width).generate_from_frequencies(dict(tuples))
+    Cloud.to_file(luogo + '_wordcloud_relative_words.jpg')
 
     #creating  tfid fpr trigrams
     vectorizer_tr = CountVectorizer(ngram_range=(3, 3))
@@ -243,6 +248,12 @@ for file in files:
     words_trigr = (ranking_trigr.sort_values('rank', ascending=False))
     print("\n\nWords head : \n", words_trigr.head(7))
     words_trigr.to_excel(luogo + "_relative_trigrams.xlsx")
+    tuples_trigr = [tuple(x) for x in words_trigr.values]
+    WC_height = 500
+    WC_width = 800
+    Cloud = WordCloud(background_color="white", max_words=100, height=WC_height,
+                      width=WC_width).generate_from_frequencies(dict(tuples_trigr))
+    Cloud.to_file(luogo + '_wordcloud_relative_tirgrams.jpg')
 
     #creating  tfid for bigrams
     vectorizer_bi = CountVectorizer(ngram_range=(2, 2))
@@ -260,9 +271,15 @@ for file in files:
     for col, term in enumerate(features):
         data1.append((term, sums[0, col]))
     ranking = pd.DataFrame(data1, columns=['term', 'rank'])
-    words = (ranking.sort_values('rank', ascending=False))
-    print("\n\nWords : \n", words.head(7))
-    words.to_excel(luogo + "_relative_bigrams.xlsx")
+    words_big = (ranking.sort_values('rank', ascending=False))
+    print("\n\nWords : \n", words_big.head(7))
+    words_big.to_excel(luogo + "_relative_bigrams.xlsx")
+    tuples_big = [tuple(x) for x in words_big.values]
+    WC_height = 500
+    WC_width = 800
+    Cloud = WordCloud(background_color="white", max_words=100, height=WC_height,
+                      width=WC_width).generate_from_frequencies(dict(tuples_big))
+    Cloud.to_file(luogo + '_wordcloud_relative_bigrams.jpg')
 
     ###FREQENZE ASSOLUTE###
     #freqdist bigrammi
@@ -273,11 +290,6 @@ for file in files:
     Frequenze_big = FreqDist(Bigrams)
     rslt_bi = pd.DataFrame(Frequenze_big.most_common(80), columns=['Bigrams', 'Frequency'])
     rslt_bi.to_excel(luogo + '_bigram.xlsx')
-    '''fig = px.bar(rslt_bi, x='Bigrams', y='Frequency', title='Top 20 bigrammi', template='plotly_white',
-                 labels={'Bigrams': 'Bigrammi', 'Frequency': 'Occorrenze'})
-    fig.show()
-    fig.save_fig(luogo + '_distribution_bigram.png')'''
-
     #word cloud
     bigrams_list = list(nltk.bigrams(testo))
     #print(bigrams_list)
@@ -299,7 +311,7 @@ for file in files:
     WC_max_words = 100
     wordCloud = WordCloud(max_words=WC_max_words, height=WC_height, width=WC_width, stopwords=stop_words, background_color="white")
     wordCloud.generate_from_frequencies(words_dict)
-    plt.title('Most frequently occurring bigrams connected by same colour and font size')
+    #plt.title('Most frequently occurring bigrams connected by same colour and font size')
     #plt.imshow(wordCloud, interpolation='bilinear')
     #plt.axis("off")
     #plt.show()
@@ -311,10 +323,6 @@ for file in files:
     # print(Frequenze_trig.most_common(20))
     rslt_tr = pd.DataFrame(Frequenze_trig.most_common(80), columns=['Trigrams', 'Frequency'])
     rslt_tr.to_excel(luogo + '_trigram.xlsx')
-    '''fig = px.bar(rslt_tr, x='Trigrams', y='Frequency', title='Top 2 trigrammi', template='plotly_white',
-                 labels={'Trigrams': 'Trigrammi', 'Frequency': 'Occorrenze'})
-    fig.show()
-    fig.savefig(luogo + '_distribution_trigram.jpg')'''
 
     trigrams_list = list(nltk.trigrams(testo))
     # print(bigrams_list)
