@@ -9,4 +9,4 @@ for f in glob.glob("*.xlsx"):
     all_data = all_data.append(df,ignore_index=True)
 
 print(all_data)
-all_data.to_csv("wf_aggregato.csv")
+all_data.to_csv("civ_aggregato.csv")

@@ -81,19 +81,19 @@ def collocations(words,myseries,length,text_column="processed"): #text column de
 			if length_forward+1>len(row[text_column]):
 				length_forward=len(row[text_column])
 			collocate=row[text_column][length_back:length_forward]
-			print (collocate)
+			#print (collocate)
 			for parola in collocate:
 				if parola not in results["ITEM"].values:
 					result_row["ITEM"]=parola
 					result_row[word]=1
 					results=results.append(result_row,ignore_index=True)
 					results=results.set_index("ITEM",drop=False)
-					print (results)
+					#print (results)
 				else:
 					results.at[parola,word]=results.at[parola,word]+1
 		results_rel["ITEM"]=results["ITEM"]
 		results_rel[word] =results[word].divide(length_subset)
-		print(results)
+		#print(results)
 		print(results_rel)
 
 	#results=results.drop(["ITEM"])
