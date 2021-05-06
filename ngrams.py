@@ -42,7 +42,7 @@ from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
 stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia','9z3vqo', 'en',
                     'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r',
-                    '[deleted]', 'deleted','delete', 'delet', '™','TM'])
+                    '[deleted]', 'deleted','delete', 'delet', '™','TM', "html", 'oh'])
 #'would', 'want', 'could', 'go', 'get',
 
 #tokenizing
@@ -128,7 +128,10 @@ for file in files:
     nomefile = file.split(".")[0]
     luogo = nomefile.split("_")[0].lower()
     print(luogo)
-    df = pd.read_csv(file)
+    try:
+        df = pd.read_csv(file)
+    except:
+        df = pd.read_csv(file, sep=";")
     #df['english'] = df['Message'].apply(translator.translate, lang_src='it', lang_tgt='en')
     #print(df['english'])
     #print(df.columns)
