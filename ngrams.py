@@ -42,7 +42,7 @@ from nltk.corpus import stopwords
 stop_words = stopwords.words('english')
 stop_words.extend([ 'u', 'https', 'www', 'youtube',  'com', 'removed', 'http',  'wikipedia','9z3vqo', 'en',
                     'org', 'wiki', 'rep', 'like', 'wikia', 'youtub', 'yldaukrnl2q', 'r',
-                    '[deleted]', 'deleted','delete', 'delet', '™','TM', "html", 'oh'])
+                    '[deleted]', 'deleted','delete', 'delet', '™','TM', "html", 'oh', '�'])
 #'would', 'want', 'could', 'go', 'get',
 
 #tokenizing
@@ -93,7 +93,7 @@ def emoji(string):
 def clean(series):
     series= series.str.lower()
     series=series.dropna()
-    for i in "“#‼$%&!'-★”’•()*+,-™./:;<=>?@[\\]☑🤣😂^🇮🇹🤦👏🔴⚠_`{|}\n\t\"":
+    for i in "“#‼$%&!'-★”’•()*+,-™./:;�<=>?@[\\]☑🤣😂^🇮🇹🤦👏🔴⚠_`{|}\n\t\"":
         series = series.str.replace(i, " ")
     series = series.str.replace("  ", "#")
     series = series.str.replace("#", " ")
